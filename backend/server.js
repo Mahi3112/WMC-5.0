@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const passport = require('./auth.js');
 const databaseConnection = require('./db.js');
 const UserRoutes=require('./routes/UserRoutes.js')
-
+const eventRoutes=require('./routes/EventRoute.js')
 
 // //Connect database
 databaseConnection();
@@ -31,7 +31,7 @@ const localAuthMiddleware=passport.authenticate('local',{session:false})
 
 // //Use routers
 app.use('/user',UserRoutes);
-// app.use('/candidate',CandidateRoute);
+app.use('/events', eventRoutes);
 
 app.listen(process.env.PORT,()=>{
     console.log(`Server listen at port ${process.env.PORT}`);
