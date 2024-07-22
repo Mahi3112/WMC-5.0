@@ -173,7 +173,7 @@ const login = async (req, res) => {
 
         // Find user by username
         const user = await User.findOne({ username });
-        
+
         console.log('User Found:', user);
 
         if (!user) {
@@ -198,13 +198,28 @@ const login = async (req, res) => {
         const token = generateToken(payload);
         console.log('Generated Token:', token);
 
-        res.status(200).json({ token });
+        // Prepare user data for response
+        const userData = {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            role: user.role
+        };
+
+        // Include virtual currency only if the user is a member
+        if (user.role === 'member') {
+            userData.virtualCurrency = user.virtualCurrency;
+        }
+
+        res.status(200).json({
+            token,
+            user: userData
+        });
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
 
 
 

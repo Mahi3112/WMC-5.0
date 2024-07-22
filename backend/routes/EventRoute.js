@@ -28,4 +28,7 @@ router.delete('/deleteevent/:id', eventController.deleteEvent);
 
 router.put('/editevent/:id',jwtAuthMiddleware,upload.single('posterImage'), eventController.editEvent);
 
+
+
+
 module.exports = router;

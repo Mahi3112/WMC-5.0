@@ -84,9 +84,43 @@ exports.editEvent = async (req, res) => {
 
 
 // Get All Events
+// exports.getAllEvents = async (req, res) => {
+//     try {
+//         const events = await Event.find();
+//         res.status(200).json(events);
+//     } catch (error) {
+//         console.error('Error fetching events:', error);
+//         res.status(500).json({ message: 'Server error', error });
+//     }
+// };
+
 exports.getAllEvents = async (req, res) => {
     try {
-        const events = await Event.find();
+        const events = await Event.aggregate([
+            {
+                $lookup: {
+                    from: 'registrations', // This should be the name of your registrations collection
+                    localField: '_id',
+                    foreignField: 'event',
+                    as: 'registrations'
+                }
+            },
+            {
+                $addFields: {
+                    registrationCount: { $size: '$registrations' }
+                }
+            },
+            {
+                $project: {
+                    title: 1,
+                    description: 1,
+                    date: 1,
+                    location: 1,
+                    registrationCount: 1
+                }
+            }
+        ]);
+
         res.status(200).json(events);
     } catch (error) {
         console.error('Error fetching events:', error);
@@ -94,12 +128,14 @@ exports.getAllEvents = async (req, res) => {
     }
 };
 
+
+
 // Delete Event
 exports.deleteEvent = async (req, res) => {
     try {
-        // if (req.user.role !== 'admin') {
-        //     return res.status(403).json({ message: 'Forbidden: Only admins can delete events.' });
-        // }
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: Only admins can delete events.' });
+        }
 
         const { id } = req.params;
         const deletedEvent = await Event.findByIdAndDelete(id);
