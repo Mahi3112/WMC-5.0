@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import backgroundImage from './background.jpeg'; // Ensure you have a background image in your project
+import backgroundImage from '../background.jpeg'; // Ensure you have a background image in your project
 
 const Container = styled.div`
   display: flex;
