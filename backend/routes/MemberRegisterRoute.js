@@ -7,6 +7,6 @@ const eventController = require('../controllers/MemberRegisterController');
 router.use(jwtAuthMiddleware)
 // Member routes
 router.get('/get-events', isMember, eventController.getEvents);
-router.post('/register/:id', isMember,  eventController.registerEvent);
+router.post('/register/:id', isMember, eventController.registerEvent);
 
 module.exports = router;

@@ -72,8 +72,7 @@ const User = require('../models/UserModel');
 const registerEvent = async (req, res) => {
     try {
         const eventId = req.params.id;
-        const userId = req.user?.id;  // Ensure req.user is properly set by your authentication middleware
-        const { numMembers, email } = req.body;
+        const userId = req.user?.id; // Ensure req.user is properly set by your authentication middleware
 
         if (!userId) {
             console.error('User ID is not set in request');
@@ -82,9 +81,8 @@ const registerEvent = async (req, res) => {
 
         console.log('Event ID:', eventId);
         console.log('User ID:', userId);
-        console.log('Request Body:', req.body);
 
-        // Fetch user and check virtual currency balance
+        // Fetch user
         const user = await User.findById(userId);
         if (!user) {
             console.error('User not found');
@@ -96,47 +94,42 @@ const registerEvent = async (req, res) => {
             return res.status(403).json({ message: 'Only members can register for events' });
         }
 
-        // Find the event and update registration count
+        // Find the event
         const event = await Event.findById(eventId);
         if (!event) {
             console.error('Event not found');
             return res.status(404).json({ message: 'Event not found' });
         }
 
-        const totalPaymentAmount = numMembers * 100; // Assuming a fixed rate for simplicity
-
-        if (user.virtualCurrency < totalPaymentAmount) {
-            console.error('Insufficient virtual currency');
-            return res.status(400).json({ message: 'Insufficient virtual currency' });
+        // Check if the user has already registered for the event
+        const existingRegistration = await Registration.findOne({ event: eventId, user: userId });
+        if (existingRegistration) {
+            console.error('User already registered for this event');
+            return res.status(400).json({ message: 'You have already registered for this event' });
         }
 
-        // Deduct virtual currency
-        user.virtualCurrency -= totalPaymentAmount;
-        await user.save();
-
         // Increment registration count
-        event.registrationCount += numMembers;
+        event.registrationCount += 1;
         await event.save();
 
         // Create a new registration
         const newRegistration = new Registration({
             event: eventId,
             user: userId,
-            email,
-            numMembers,
-            paymentAmount: totalPaymentAmount
         });
         await newRegistration.save();
 
-        res.status(201).json({ 
-            message: `Registered for event "${event.title}" successfully`, 
-            virtualCurrency: user.virtualCurrency 
+        res.status(201).json({
+            message: `Registered for event "${event.title}" successfully`,
         });
     } catch (error) {
         console.error('Error in registerEvent function:', error);
         res.status(500).json({ message: 'Error registering for event', error: error.message || error });
     }
 };
+
+
+
 
 const getEvents = async (req, res) => {
     try {

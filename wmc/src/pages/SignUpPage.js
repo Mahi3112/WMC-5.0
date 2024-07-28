@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-import backgroundImage from '../background.jpeg'; // Ensure you have a background image in your project
+import { Link, useNavigate } from 'react-router-dom';
+import backgroundImage from '../images/background.jpeg'; // Ensure you have a background image in your project
+import axios from 'axios';
 
 const Container = styled.div`
   display: flex;
@@ -206,12 +207,38 @@ const SignInLink = styled.div`
 `;
 
 const SignUpPage = () => {
-  const [role, setRole] = useState('Select Role'); // Default role is 'user'
+  const [data, setData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    role: "select role"
+  });
 
-  const handleSubmit = (event) => {
+  const navigate = useNavigate();
+
+  const handleChange = ({ currentTarget: input }) => {
+    setData({ ...data, [input.name]: input.value });
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // You can add your form submission logic here
-    alert('Form submitted!');
+
+    // Include role in the data
+    try {
+      const url = "http://localhost:8000/user/signup";
+      const { data: res } = await axios.post(url, data);
+      navigate("/");
+      console.log(res.message);
+    } catch (error) {
+      // Improved error handling
+      if (error.response && error.response.data) {
+        console.error('Signup error:', error.response.data);
+        alert(`Error signing up: ${error.response.data.error || 'Unknown error'}`);
+      } else {
+        console.error('Signup error:', error.message);
+        alert('Error signing up');
+      }
+    }
   };
 
   return (
@@ -220,22 +247,22 @@ const SignUpPage = () => {
         <Title>Sign Up</Title>
         <form onSubmit={handleSubmit}>
           <UserBox>
-            <Input type="text" name="username" required />
+            <Input type="text" name="username" required value={data.username} onChange={handleChange} />
             <Label>Username</Label>
           </UserBox>
           <UserBox>
-            <Input type="email" name="email" required />
+            <Input type="email" name="email" required value={data.email} onChange={handleChange} />
             <Label>Email</Label>
           </UserBox>
           <UserBox>
-            <Input type="password" name="password" required />
+            <Input type="password" name="password" required value={data.password} onChange={handleChange} />
             <Label>Password</Label>
           </UserBox>
           <UserBox>
-            <Select name="role" value={role} onChange={(e) => setRole(e.target.value)} required>
-              <option value="select role">Select Role</option>
+            <Select name="role" value={data.role} onChange={handleChange} required>
+              <option value="select role" disabled>Select Role</option>
               <option value="admin">Admin</option>
-              <option value="user">User</option>
+              <option value="member">Member</option>
             </Select>
             <Label></Label>
           </UserBox>

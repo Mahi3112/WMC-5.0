@@ -10,6 +10,7 @@ const Membership=require('./routes/AdminMembershipRoute.js');
 const UserMembership=require('./routes/UserMembershipRoute.js');
 const Feedback=require('./routes/StoryRoute.js');
 const Donation=require('./routes/DonationRoute.js');
+const cors = require('cors');
 // //Connect database
 databaseConnection();
 
@@ -32,6 +33,13 @@ app.use(logRequest);
 //Authentication
 app.use(passport.initialize());
 const localAuthMiddleware=passport.authenticate('local',{session:false})
+
+
+app.use(cors({
+    origin: 'http://localhost:3000', // Allow your frontend's origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow the HTTP methods you need
+    allowedHeaders: ['Content-Type', 'Authorization'] // Allow headers you need
+  }));
 
 // //Use routers
 app.use('/user',UserRoutes);

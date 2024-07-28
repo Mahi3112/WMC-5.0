@@ -224,19 +224,24 @@ const login = async (req, res) => {
 
 
 //Profile Route
-const getprofile=async(req,res)=>{
+const getprofile = async (req, res) => {
     try {
-        const userData=req.user;
-
-        const userId=userData.id;
-        const user=await User.findById(userId);
-
-        res.status(200).json({user});
+      const userId = req.params.id; // Correctly get userId from request parameters
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID is required' });
+      }
+  
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.json(user);
     } catch (error) {
-        console.log(error);
-        res.status(500).json({error:'Internal Server Error'});
+      console.error('Error fetching user profile:', error);
+      res.status(500).json({ message: 'Internal server error' });
     }
-};
+  };
 
 //Change password Route
 const changepassword=async(req,res)=>{
@@ -263,4 +268,16 @@ const changepassword=async(req,res)=>{
     }
 };
 
-module.exports={login,signup,changepassword,getprofile}
+const logout = (req, res) => {
+    // Clear any session data if using sessions
+    req.session = null; // Assuming you're using some session middleware like express-session
+
+    // Optionally, you can also clear cookies if you're using them
+    res.clearCookie('token'); // Assuming you're using cookies to store the token
+
+    res.status(200).json({ message: 'Logout successful' });
+};
+
+
+
+module.exports={login,signup,changepassword,getprofile,logout}

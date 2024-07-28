@@ -21,18 +21,11 @@ const eventSchema = new mongoose.Schema({
     registrationCount: {
         type: Number,
         default: 0
+    },
+    posterImage: {
+        type: String, // This can be a URL or a path to the image
+        required: false
     }
-    // posterImage: {
-    //     type: String, // This can be a URL or a path to the image
-    //     required: false
-    // }
-    // createdBy: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'User',
-    //     required: true
-    // }
-
-    
 }, {
     timestamps: true
 });

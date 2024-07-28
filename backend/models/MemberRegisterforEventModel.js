@@ -12,18 +12,7 @@ const RegistrationSchema = new Schema({
         ref: 'User',
         required: true
     },
-    email: {
-        type: String,
-        required: true
-    },
-    numMembers: {
-        type: Number,
-        required: true
-    },
-    paymentAmount: {
-        type: Number,
-        required: true
-    },
+    
     // membershipStatus: {  // Added field for membership status
     //     type: String,
     //     enum: ['standard', 'premium', 'vip'],  // Assuming you have these statuses

@@ -1,14 +1,17 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema; // Import Schema
 const bcrypt = require('bcrypt');
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
     username: {
         type: String,
         required: true
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true, // Ensure email is unique
+        match: [/.+@.+\..+/, 'Please enter a valid email address'] // Simple email validation
     },
     password: {
         type: String,
@@ -24,15 +27,17 @@ const userSchema = new mongoose.Schema({
         default: 10000000
     },
     membershipStatus: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Membership'
+        type: String,
+       
+        required: false 
     },
     memberStory: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'MemberStory'
+        type: Schema.Types.ObjectId,
+        ref: 'MemberStory',
+        required: false // Adjust based on requirements
     },
     registeredEvents: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Event'
     }]
 }, { timestamps: true });

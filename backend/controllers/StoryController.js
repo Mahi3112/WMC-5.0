@@ -71,4 +71,4 @@ exports.deleteStory = async (req, res) => {
         console.error('Error deleting member story:', error);
         res.status(500).json({ message: 'Server error', error });
     }
-};
+  };

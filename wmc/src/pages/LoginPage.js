@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
-import backgroundImage from '../background.jpeg'; // Ensure you have a background image in your project
+import axios from 'axios';
+import backgroundImage from '../images/background.jpeg'; // Ensure you have a background image in your project
 
 const Container = styled.div`
   display: flex;
@@ -33,6 +34,7 @@ const UserBox = styled.div`
 `;
 
 const Input = styled.input`
+  background: transparent;
   width: 100%;
   padding: 10px 0;
   font-size: 16px;
@@ -41,7 +43,6 @@ const Input = styled.input`
   border: none;
   border-bottom: 1px solid #fff;
   outline: none;
-  background: transparent;
 
   &:focus ~ label,
   &:valid ~ label {
@@ -192,24 +193,39 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
-    // Add your authentication logic here
-    // For demonstration, we'll assume login is always successful
     if (username && password) {
-      // If authentication is successful, navigate to the homepage
-      navigate('/homepage');
+      try {
+        const response = await axios.post('/user/login', { username, password });
+        const { token, user } = response.data;
+  
+        // Store token and user information in local storage
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+  
+        // Store userId in local storage
+        localStorage.setItem('userId', user.userId); // Assuming user.userId is the correct path
+  
+        // Navigate based on user role
+        if (user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/home');
+        }
+      } catch (error) {
+        alert('Login failed. Please check your credentials and try again.');
+      }
     } else {
-      // Handle login failure (e.g., show an error message)
-      alert('Please enter a valid username and password.');
+      alert('Please enter a valid email and password.');
     }
   };
-
+  
   return (
     <Container>
       <LoginBox>
         <Title>Login</Title>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleLogin}>
           <UserBox>
             <Input 
               type="text" 
