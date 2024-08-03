@@ -13,11 +13,7 @@ const RegistrationSchema = new Schema({
         required: true
     },
     
-    // membershipStatus: {  // Added field for membership status
-    //     type: String,
-    //     enum: ['standard', 'premium', 'vip'],  // Assuming you have these statuses
-    //     default:'standard'
-    // },
+   
     registrationDate: {
         type: Date,
         default: Date.now

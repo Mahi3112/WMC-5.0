@@ -11,6 +11,10 @@ const UserMembership=require('./routes/UserMembershipRoute.js');
 const Feedback=require('./routes/StoryRoute.js');
 const Donation=require('./routes/DonationRoute.js');
 const cors = require('cors');
+const path = require('path'); 
+const inquiry=require('./routes/InquiryRoute.js')
+
+
 // //Connect database
 databaseConnection();
 
@@ -40,6 +44,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow the HTTP methods you need
     allowedHeaders: ['Content-Type', 'Authorization'] // Allow headers you need
   }));
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // //Use routers
 app.use('/user',UserRoutes);
@@ -49,6 +54,8 @@ app.use('/membership',Membership);
 app.use('/usermembership',UserMembership);
 app.use('/feedback',Feedback);
 app.use('/donation',Donation);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve static files
+app.use('/inquiry', inquiry);
 
 app.listen(process.env.PORT,()=>{
     console.log(`Server listen at port ${process.env.PORT}`);

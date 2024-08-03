@@ -21,11 +21,12 @@ const jwtAuthMiddleware = (req, res, next) => {
 
 
 const generateToken = (userData) => {
-    // Ensure that `role` is included in the token payload
     return jwt.sign({
         id: userData.id,
-        role: userData.role // Ensure role is included
+        username: userData.username, 
+        role: userData.role
     }, process.env.JWT_SECRET);
 };
+
 
 module.exports = { jwtAuthMiddleware, generateToken };

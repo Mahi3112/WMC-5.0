@@ -6,7 +6,13 @@ import { DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from "@ant-de
 import moment from 'moment';
 import { AddItemAction, DeleteItemAction } from '../actions/AdminPageAction';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
+import { createGlobalStyle } from 'styled-components';
+import { AiOutlineLogout } from "react-icons/ai";
+import { CgProfile } from "react-icons/cg";
+import { BsCurrencyExchange } from 'react-icons/bs';
+import { FaQuoteLeft } from "react-icons/fa";
 const { confirm } = Modal;
 
 
@@ -93,6 +99,95 @@ const StyledForm = styled(Form)`
   .ant-form-item-control-input {
     background: linear-gradient(145deg, #3E1A3A, #2C142C);
   }
+`;
+const Navbar = styled.nav`
+font-family: "Roboto Condensed";
+  position:fixed;
+  top: 0;
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 50px;
+  background-color:white;
+`;
+
+
+
+const NavBrand = styled.div`
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background: transparent;
+
+    span {
+        color: #fff;
+        font-size: 24px;
+        font-weight: bold;
+        margin-left: 10px;
+    }
+`;
+
+const CenteredNavLinks = styled.div`
+  display: flex;
+  justify-content: center;
+  flex: 1;
+`;
+
+// Style for NavLink elements
+const NavLink = styled(Link)`
+  color:  #2C142C;
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 15px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-family: 'Roboto Condensed', sans-serif;
+
+  &:hover {
+    color: #F6A2DE;
+  }
+`;
+
+// Container for navigation icons, aligned to the right
+const NavButtonsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* Pushes the container to the right */
+`;
+
+// Style for navigation icons
+const NavButton = styled(Link)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px; /* Adjust width as needed */
+  height: 40px;
+  border-radius: 20px; /* Makes the button pill-shaped */
+  background: transparent;
+  color: #fff;
+  font-size: 24px;
+  text-decoration: none;
+  transition: background 0.3s, color 0.3s;
+  margin-left: 10px; /* Space between icons */
+  padding: 0 10px; /* Space inside the button */
+  
+  &:hover {
+    background: #f0f0f0; /* Background color on hover */
+    color: #000; /* Icon color on hover */
+  }
+
+  div {
+    color: yellow; /* Color of the text */
+    margin-left: 5px; /* Space between icon and text */
+    font-size: 16px; /* Adjust text size as needed */
+  }
+`;
+
+const FlexContainer = styled.div`
+  display: flex;
+  align-items: center;
 `;
 const AdminPage = () => {
   const [popupModal, setPopupModal] = useState(false);
@@ -230,8 +325,24 @@ const AdminPage = () => {
 
   return (
     <AdminPageWrapper>
+      <Navbar>
+    <NavBrand>
+      {/* <img src={logo} alt="Epsilon Program Logo" /> */}
+      <span style={{color:' #2C142C'}}>Epsilon Program</span>
+    </NavBrand>
+    <CenteredNavLinks>
+    <NavLink to="/admin">Add Events</NavLink>
+
+      <NavLink to="/admininquiry">Inquiries</NavLink>
+
+
+    </CenteredNavLinks>
+    
+  </Navbar>
+
+      
       <Header>
-        <Title>Welcome back Admin!!</Title>
+        <Title style={{paddingTop:'50px'}}>Welcome back Admin!!</Title>
         <SubTitle>Event Management</SubTitle>
         <ActionButton type='primary' onClick={() => setPopupModal(true)}>Add Event</ActionButton>
       </Header>

@@ -2,7 +2,42 @@ const bcrypt = require('bcrypt');
 const User = require('./../models/UserModel.js');
 
 
+const Donation=require('./../models/DonationModel.js');
 const { generateToken } = require('./../jwt.js');
+
+const multer = require('multer');
+const path = require('path');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, './../uploads')); // Adjust the directory as needed
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname)); // Add timestamp to filename
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// Controller function for uploading profile image
+const uploadProfileImage = async (req, res) => {
+    try {
+        const userId = req.params.id; // Assuming user ID is passed as a URL parameter
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const relativePath = `/uploads/${req.file.filename}`; // Save the relative path to the user's profileImage field
+        user.profileImage = relativePath;
+        await user.save();
+
+        res.status(200).json({ message: 'Profile image uploaded successfully', profileImage: relativePath });
+    } catch (error) {
+        console.error('Error uploading profile image:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
 
 //Only one admin function
 const oneadmin = async () => {
@@ -180,20 +215,11 @@ const login = async (req, res) => {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
 
-        // Compare provided password with stored hashed password
-        // const isMatch = await bcrypt.compare(password, user.password);
-        // console.log('Provided Password:', password);
-        // console.log('Stored Hashed Password:', user.password);
-        // console.log('Password Match:', isMatch);
-
-        // if (!isMatch) {
-        //     return res.status(401).json({ error: 'Invalid username or password' });
-        // }
-
-        // Generate token with user ID and role
+        
         const payload = {
             id: user.id,
-            role: user.role // Ensure role is included
+            role: user.role, // Ensure role is included
+            username:user.username
         };
         const token = generateToken(payload);
         console.log('Generated Token:', token);
@@ -226,22 +252,60 @@ const login = async (req, res) => {
 //Profile Route
 const getprofile = async (req, res) => {
     try {
-      const userId = req.params.id; // Correctly get userId from request parameters
-      if (!userId) {
-        return res.status(400).json({ message: 'User ID is required' });
-      }
-  
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-      res.json(user);
+        const userId = req.params.id; // Correctly get userId from request parameters
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is required' });
+        }
+
+        const user = await User.findById(userId).populate('registeredEvents');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Fetch total donations
+        const totalDonations = await getTotalDonationsByUserId(userId);
+
+        // Respond with user data including total donations
+        res.status(200).json({ ...user.toObject(), totalDonations });
     } catch (error) {
-      console.error('Error fetching user profile:', error);
-      res.status(500).json({ message: 'Internal server error' });
+        console.error('Error fetching user profile:', error);
+        if (!res.headersSent) {
+            res.status(500).json({ message: 'Internal server error' });
+        }
     }
-  };
+};
+
+// Function to get total donations by user ID
+const getTotalDonationsByUserId = async (userId) => {
+    try {
+        const donations = await Donation.find({ user: userId });
+        const totalDonations = donations.reduce((total, donation) => total + donation.amount, 0);
+        return totalDonations;
+    } catch (error) {
+        console.error("Error fetching donations:", error);
+        return 0; // Return 0 if there's an error fetching donations
+    }
+};
+const getDonationsByDate = async (req, res) => {
+    try {
+        const donations = await Donation.aggregate([
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    totalAmount: { $sum: "$amount" },
+                    donations: { $push: "$$ROOT" }
+                }
+            },
+            { $sort: { _id: 1 } } // Sort by date
+        ]);
+
+        res.status(200).json(donations);
+    } catch (error) {
+        console.error('Error fetching donations by date:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 
 //Change password Route
 const changepassword=async(req,res)=>{
@@ -269,15 +333,20 @@ const changepassword=async(req,res)=>{
 };
 
 const logout = (req, res) => {
-    // Clear any session data if using sessions
-    req.session = null; // Assuming you're using some session middleware like express-session
+    try {
+      console.log("Logout function called");
+  
+      // Clear the token cookie
+      res.clearCookie('token'); // Adjust if your token cookie name is different
+      console.log("Cookie cleared");
+  
+      res.status(200).json({ message: 'Logout successful' });
+      console.log("Response sent");
+    } catch (error) {
+      console.error("Error during logout:", error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
+  
 
-    // Optionally, you can also clear cookies if you're using them
-    res.clearCookie('token'); // Assuming you're using cookies to store the token
-
-    res.status(200).json({ message: 'Logout successful' });
-};
-
-
-
-module.exports={login,signup,changepassword,getprofile,logout}
+module.exports={login,signup,changepassword,getprofile,logout,getDonationsByDate,upload, uploadProfileImage}

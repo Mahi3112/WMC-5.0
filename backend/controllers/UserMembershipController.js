@@ -25,6 +25,44 @@ exports.getMembershipDetails = async (req, res) => {
     }
 };
 
+// exports.purchaseMembership = async (req, res) => {
+//     try {
+//         const { membershipName } = req.body;
+//         if (!membershipName) {
+//             return res.status(400).json({ message: 'Membership name is required' });
+//         }
+
+//         const membership = await Membership.findOne({ name: membershipName });
+//         if (!membership) {
+//             return res.status(404).json({ message: 'Membership not found' });
+//         }
+
+//         const userId = req.user.id;
+//         const user = await User.findById(userId);
+//         if (!user) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
+
+//         if (user.virtualCurrency < membership.price) {
+//             return res.status(400).json({ message: 'Insufficient virtual currency' });
+//         }
+
+//         // Check if the user already has a membership
+//         if (user.membershipStatus && user.membershipStatus !== membershipName) {
+//             return res.status(400).json({ message: 'You already have an active membership. Please cancel the current one before purchasing a new one.' });
+//         }
+
+//         user.virtualCurrency -= membership.price;
+//         user.membershipStatus = membershipName;
+//         await user.save();
+
+//         res.status(200).json({ message: 'Membership purchased successfully', virtualCurrency: user.virtualCurrency });
+//     } catch (error) {
+//         console.error('Error purchasing membership:', error);
+//         res.status(500).json({ message: 'Server error', error });
+//     }
+// };
+
 exports.purchaseMembership = async (req, res) => {
     try {
         const { membershipName } = req.body;
@@ -52,16 +90,35 @@ exports.purchaseMembership = async (req, res) => {
             return res.status(400).json({ message: 'You already have an active membership. Please cancel the current one before purchasing a new one.' });
         }
 
+        // Deduct the membership price and set the new membership status
         user.virtualCurrency -= membership.price;
         user.membershipStatus = membershipName;
+
+        // Determine cashback amount based on membership
+        let cashback = 0;
+        if (membershipName === 'basic') {
+            cashback = 40;
+        } else if (membershipName === 'standard') {
+            cashback = 260;
+        } else if (membershipName === 'premium') {
+            cashback = 710;
+        }
+
+        // Add cashback to the user's virtual currency
+        user.virtualCurrency += cashback;
         await user.save();
 
-        res.status(200).json({ message: 'Membership purchased successfully', virtualCurrency: user.virtualCurrency });
+        res.status(200).json({ 
+            message: 'Membership purchased successfully', 
+            virtualCurrency: user.virtualCurrency,
+            cashback // Return the cashback amount
+        });
     } catch (error) {
         console.error('Error purchasing membership:', error);
         res.status(500).json({ message: 'Server error', error });
     }
 };
+
 
 exports.cancelMembership = async (req, res) => {
     try {

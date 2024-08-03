@@ -33,16 +33,16 @@ exports.makeDonation = async (req, res) => {
     }
 };
 
-exports.getTotalDonations = async (req, res) => {
-    try {
-        const totalDonations = await Donation.aggregate([
-            { $group: { _id: null, total: { $sum: '$amount' } } }
-        ]);
+// exports.getTotalDonations = async (req, res) => {
+//     try {
+//         const totalDonations = await Donation.aggregate([
+//             { $group: { _id: null, total: { $sum: '$amount' } } }
+//         ]);
 
-        const total = totalDonations[0]?.total || 0;
-        res.status(200).json({ total });
-    } catch (error) {
-        console.error('Error fetching total donations:', error);
-        res.status(500).json({ message: 'Server error', error });
-    }
-};
+//         const total = totalDonations[0]?.total || 0;
+//         res.status(200).json({ total });
+//     } catch (error) {
+//         console.error('Error fetching total donations:', error);
+//         res.status(500).json({ message: 'Server error', error });
+//     }
+// };

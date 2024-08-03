@@ -11,7 +11,6 @@ const userSchema = new Schema({
         type: String,
         required: true,
         unique: true, // Ensure email is unique
-        match: [/.+@.+\..+/, 'Please enter a valid email address'] // Simple email validation
     },
     password: {
         type: String,
@@ -39,7 +38,18 @@ const userSchema = new Schema({
     registeredEvents: [{
         type: Schema.Types.ObjectId,
         ref: 'Event'
-    }]
+    }],
+    donations: [{
+        amount: Number,
+        date: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+    profileImage: {
+        type: String
+    }
+    
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {

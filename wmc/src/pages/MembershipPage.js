@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import gtaLogo from '../images/epsilon.png'; 
-import { AiOutlineLogout } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
 import { BsCurrencyExchange } from 'react-icons/bs';
-import { FaQuoteLeft } from "react-icons/fa";
+
+// Styled Components
 const Navbar = styled.nav`
   font-family: "Roboto Condensed";
   position: fixed;
@@ -162,6 +161,87 @@ const PageBackground = styled.div`
     background-attachment: fixed;
 `;
 
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(145deg, #3E1A3A, #2C142C);
+    margin-top: 100px;
+`;
+
+const PricingSection = styled.section`
+    width: 100%;
+    max-width: 800px;
+`;
+
+const PricingTitle = styled.h2`
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    color: #fff;
+`;
+
+const PricingTable = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+`;
+
+const PricingCard = styled.div`
+    background: #461E46;
+    border-radius: 10px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    color: #fff;
+    position: relative;
+
+    .current-membership {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #F6A2DE;
+        color: #000;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        background: #F6A2DE;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+
+        &:hover {
+            background: #E53F72;
+        }
+    }
+`;
+
+const Message = styled.p`
+    font-size: 1rem;
+    color: #d9534f;
+    margin-top: 20px;
+`;
+
+const VirtualCurrency = styled.p`
+    font-size: 1.2rem;
+    color: #5bc0de;
+    margin-top: 10px;
+`;
+
 const MembershipPage = () => {
     const [memberships, setMemberships] = useState([]);
     const [message, setMessage] = useState('');
@@ -179,6 +259,25 @@ const MembershipPage = () => {
         };
 
         fetchMemberships();
+    }, []);
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get('/user/getprofile', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setVirtualCurrency(response.data.virtualCurrency);
+                setCurrentMembership(response.data.membershipStatus); // assuming membershipStatus is returned here
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        fetchUserProfile();
     }, []);
 
     const handlePurchase = async (membershipName) => {
@@ -214,145 +313,66 @@ const MembershipPage = () => {
     };
 
     return (
-        <PageBackground >
-        <Container>
-            <Navbar>
-    <NavBrand>
-      {/* <img src={logo} alt="Epsilon Program Logo" /> */}
-      <span style={{border:'#fff'}}>Epsilon Program</span>
-    </NavBrand>
-    <CenteredNavLinks>
-      <NavLink to="/home">Home</NavLink>
-      <NavLink to="/stories">Member Stories</NavLink>
-      <NavLink to="/events">Events</NavLink>
-      <NavLink to="/donate">Donation</NavLink>
-      <NavLink to="/membership">Membership</NavLink>
-    </CenteredNavLinks>
-    <NavButtonsContainer>
-      {/* <NavButton onClick={handleLogout}><AiOutlineLogout /></NavButton> */}
-      <NavButton to="/profile"><CgProfile /></NavButton>
-      <NavButton>
-      <FlexContainer>
-        <BsCurrencyExchange className="icon" />
-        <div>{virtualCurrency}</div> {/* Format if needed */}
-      </FlexContainer>
-      </NavButton>
-    </NavButtonsContainer>
-  </Navbar>
+        <PageBackground>
+            <Container>
+                <Navbar>
+                    <NavBrand>
+                        <span>Epsilon Program</span>
+                    </NavBrand>
+                    <CenteredNavLinks>
+                        <NavLink to="/home">Home</NavLink>
+                        <NavLink to="/stories">Member Stories</NavLink>
+                        <NavLink to="/events">Events</NavLink>
+                        <NavLink to="/donate">Donation</NavLink>
+                        <NavLink to="/membership">Membership</NavLink>
+                        <NavLink to="/ask">Inquiry Form</NavLink>
+                    </CenteredNavLinks>
+                    <NavButtonsContainer>
+                        <NavButton to="/profile"><CgProfile /></NavButton>
+                        <NavButton>
+                            <FlexContainer>
+                                <BsCurrencyExchange className="icon" />
+                                <div>{virtualCurrency}</div>
+                            </FlexContainer>
+                        </NavButton>
+                    </NavButtonsContainer>
+                </Navbar>
 
-            <PricingSection>
-                <PricingTitle style={{color:'#fff'}}>Choose Your Plan</PricingTitle>
-                <PricingTable>
-                    {memberships.map((membership) => (
-                        <PricingCard
-                            key={membership._id}
-                            style={{
-                                color: membership.color,
-                                border: `1px solid ${membership.color}`,
-                                backgroundColor: '#BC79A6'
-                            }}
-                        >
-                            <h3>{membership.name} Plan</h3>
-                            <div className="price">${membership.price} / Month</div>
-                            <ul className="features">
-                                {membership.benefits.map((benefit, index) => (
-                                    <li key={index}>{benefit}</li>
-                                ))}
-                            </ul>
-                            {currentMembership === membership.name ? (
-                                <>
-                                    <p>Current Membership</p>
-                                    <button onClick={handleCancel} style={{
-                                        background: '#d9534f',
-                                        border: 'none',
-                                        padding: '10px 20px',
-                                        color: 'white',
-                                        fontSize: '14px',
-                                        borderRadius: '5px',
-                                        cursor: 'pointer',
-                                        transition: 'background 0.3s ease'
-                                    }}>Cancel Membership</button>
-                                </>
-                            ) : (
-                                <button onClick={() => handlePurchase(membership.name)} style={{
-                                    background: '#241024',
-                                    border: 'none',
-                                    padding: '10px 20px',
-                                    color: '#fff',
-                                    fontSize: '14px',
-                                    borderRadius: '5px',
-                                    cursor: 'pointer',
-                                    transition: 'background 0.3s ease'
-                                }}>Get Started</button>
-                            )}
-                        </PricingCard>
-                    ))}
-                </PricingTable>
-            </PricingSection>
-            {message && <Message>{message}</Message>}
-            {virtualCurrency !== null && (
-                <VirtualCurrency>
-                    Remaining Virtual Currency: {virtualCurrency}
-                </VirtualCurrency>
-            )}
+                <PricingSection>
+                    <PricingTitle>Choose Your Plan</PricingTitle>
+                    <PricingTable>
+                        {memberships.map((membership) => (
+                            <PricingCard
+                                key={membership._id}
+                                style={{
+                                    color: membership.color,
+                                    border: `1px solid ${membership.color}`,
+                                    backgroundColor: '#BC79A6'
+                                }}
+                            >
+                                {currentMembership === membership.name && <div className="current-membership">Current Membership</div>}
+                                <h3>{membership.name} Plan</h3>
+                                <div className="price">${membership.price} / Month</div>
+                                <ul className="features">
+                                    {membership.benefits.map((benefit, index) => (
+                                        <li key={index}>{benefit}</li>
+                                    ))}
+                                </ul>
+                                {currentMembership === membership.name ? (
+                                    <button onClick={handleCancel}>Cancel Membership</button>
+                                ) :(
+                                    <button onClick={() => handlePurchase(membership.name)}>Purchase</button>
+                                )}
+                            </PricingCard>
+                        ))}
+                    </PricingTable>
+                </PricingSection>
 
-        </Container>
+                {message && <Message>{message}</Message>}
+                {virtualCurrency !== null && <VirtualCurrency>Your virtual currency: {virtualCurrency}</VirtualCurrency>}
+            </Container>
         </PageBackground>
     );
 };
-
-const Container = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        background: linear-gradient(145deg, #3E1A3A, #2C142C);
-        margin-top:100px;
-
-`;
-
-const PricingSection = styled.section`
-    width: 100%;
-    max-width: 800px;
-    background:'#F6A2DE'
-`;
-
-const PricingTitle = styled.h2`
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 2rem;
-    color: #333;
-`;
-
-const PricingTable = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-`;
-
-const PricingCard = styled.div`
-    background:  #461E46;
-    border-radius: 10px;
-    padding: 20px;
-    width: 300px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-`;
-
-const Message = styled.p`
-    font-size: 1rem;
-    color: #d9534f;
-    margin-top: 20px;
-`;
-
-const VirtualCurrency = styled.p`
-    font-size: 1.2rem;
-    color: #5bc0de;
-    margin-top: 10px;
-`;
 
 export default MembershipPage;

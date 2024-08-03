@@ -231,6 +231,7 @@ const EventPage = () => {
       <NavLink to="/events">Events</NavLink>
       <NavLink to="/donate">Donation</NavLink>
       <NavLink to="/membership">Membership</NavLink>
+      <NavLink to="/ask">Inquiry Form</NavLink>
     </CenteredNavLinks>
     <NavButtonsContainer>
       {/* <NavButton onClick={handleLogout}><AiOutlineLogout /></NavButton> */}

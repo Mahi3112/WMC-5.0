@@ -1,10 +1,10 @@
 import React,{ useState, useEffect }  from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import gtaLogo from '../images/epsilon.png'; 
 import backgroundImage from '../images/firstbackground.png'; 
 import backgroundImage2 from '../images/midbackground.png';
 import backgroundImage3 from '../images/background7.avif';
+import { useHistory } from 'react-router-dom';
 
 
 import member1 from '../images/logo2.webp'; 
@@ -16,6 +16,8 @@ import member6 from '../images/logo2.webp';
 import event1 from '../images/logo2.webp'; 
 import event2 from '../images/logo2.webp'; 
 import event3 from '../images/logo2.webp';
+import { Link } from 'react-router-dom';
+
 import { createGlobalStyle } from 'styled-components';
 import { AiOutlineLogout } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
@@ -43,7 +45,7 @@ const BackgroundSection = styled.div`
   width: 100%; 
   height: 800px;
   background: #150917;
-  background-size: 95% auto; 
+  background-size: 80% auto; 
   background-position: center; 
   background-repeat: no-repeat; 
   display: flex;
@@ -644,23 +646,39 @@ const HomePage = () => {
     fetchUserProfile();
   }, []);
 
-  const handleLogout = async () => {
-    // Confirm logout action
-    const confirmed = window.confirm("Are you sure you want to log out?");
+  // const handleLogout = async () => {
+  //   // Confirm logout action
+  //   const confirmed = window.confirm("Are you sure you want to log out?");
     
+  //   if (confirmed) {
+  //     try {
+  //       await axios.post('/user/logout'); // Adjust the URL as needed
+  //       localStorage.removeItem('token'); // Remove token from localStorage
+  //       alert('Logout successful'); // Show success message
+  //       // Redirect to login or home page
+  //       window.location.href = '/';
+  //     } catch (error) {
+  //       console.error('Error logging out:', error);
+  //       alert('Logout failed'); // Show error message if needed
+  //     }
+  //   }
+  // };
+
+  const handleLogout = async () => {
+    const confirmed = window.confirm("Are you sure you want to log out?");
+  
     if (confirmed) {
       try {
-        await axios.post('/user/logout'); // Adjust the URL as needed
-        localStorage.removeItem('token'); // Remove token from localStorage
+        localStorage.removeItem('user'); // Remove token from localStorage
         alert('Logout successful'); // Show success message
-        // Redirect to login or home page
-        window.location.href = '/';
+        window.location.href = '/'; // Redirect to home page
       } catch (error) {
         console.error('Error logging out:', error);
-        alert('Logout failed'); // Show error message if needed
+        alert('Logout failed: ' + (error.response?.data?.message || error.message)); // Show error message if needed
       }
     }
   };
+
   const displayedEvents = events.slice(0, 3);
   return (
    
@@ -676,6 +694,9 @@ const HomePage = () => {
       <NavLink to="/events">Events</NavLink>
       <NavLink to="/donate">Donation</NavLink>
       <NavLink to="/membership">Membership</NavLink>
+      <NavLink to="/ask">Inquiry Form</NavLink>
+
+
     </CenteredNavLinks>
     <NavButtonsContainer>
       <NavButton onClick={handleLogout}><AiOutlineLogout /></NavButton>
@@ -706,56 +727,7 @@ const HomePage = () => {
           <GameLogo src={gtaLogo} alt="GTA V Logo" />
         </InfoSection>
       </ContentSection>
-      {/* <EventsSection>
-        <EventsTitle>Upcoming Events</EventsTitle>
-        <EventsGrid>
-          <EventCard style={{border:'2px solid #BC79A6'}}>
-           
-            <h3>Event One</h3>
-            <p>Join us for an enlightening event full of activities.</p>
-            <button style={{
-        background: '#BC79A6',
-        border: 'none',
-        padding: '10px 20px',
-        color: 'black',
-        fontSize: '14px',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        transition: 'background 0.3s ease'
-      }}>Know More</button>
-          </EventCard>
-          <EventCard style={{border:'2px solid #4EC598'}}>
-            
-            <h3>Event Two</h3>
-            <p>Don't miss out on our next big event!</p>
-            <button style={{
-        background: '#4EC598',
-        border: 'none',
-        padding: '10px 20px',
-        color: 'black',
-        fontSize: '14px',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        transition: 'background 0.3s ease'
-      }}>Know More</button>
-          </EventCard>
-          <EventCard style={{border:'2px solid #FFC874'}}>
-            
-            <h3>Event Three</h3>
-            <p>Be part of our special event this month.</p>
-            <button style={{
-        background: '#FFC874',
-        border: 'none',
-        padding: '10px 20px',
-        color: 'black',
-        fontSize: '14px',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        transition: 'background 0.3s ease'
-      }}>Know More</button>
-          </EventCard>
-        </EventsGrid>
-      </EventsSection> */}
+      
 
 <EventsSection>
         <EventsTitle>Upcoming Events</EventsTitle>
@@ -840,7 +812,7 @@ const HomePage = () => {
             <ul className="features">
               <li>Access to Basic Content</li>
               <li>Community Support</li>
-              <li>Email Updates</li>
+              <li>Cashback upto 30</li>
             </ul>
             <KnowMoreButton to='/membership'  style={{
         background: '#BC79A6',
@@ -857,9 +829,10 @@ const HomePage = () => {
             <h3>Standard Plan</h3>
             <div className="price">$5000 / Month</div>
             <ul className="features">
-              <li>All Basic Plan Features</li>
+             
               <li>Exclusive Content</li>
               <li>Discounts on Merchandise</li>
+              <li>Cashback upto 250</li>
             </ul>
             <KnowMoreButton to='/membership' style={{
         background: '#63A7A3',
@@ -876,9 +849,10 @@ const HomePage = () => {
             <h3>Premium Plan</h3>
             <div className="price">$10000 / Month</div>
             <ul className="features">
-              <li>All Standard Plan Features</li>
+             
               <li>VIP Access to Events</li>
               <li>Personalized Support</li>
+              <li>Cashback upto 700</li>
             </ul>
             <KnowMoreButton to='/membership' style={{
         background: '#C0955F',
