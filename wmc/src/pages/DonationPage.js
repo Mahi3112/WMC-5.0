@@ -17,7 +17,7 @@ const DonationPage = () => {
         const fetchVirtualCurrency = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:8000/user/getprofile', {
+                const response = await axios.get('/user/getprofile', {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -34,7 +34,7 @@ const DonationPage = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:8000/donation/donate', { amount }, {
+            const response = await axios.post('/donation/donate', { amount }, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
