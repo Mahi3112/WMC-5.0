@@ -1,3 +1,6 @@
+// 
+
+import React from 'react'; // Add this import
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
@@ -10,15 +13,15 @@ import ProfilePage from './pages/ProfilePage'; // Adjust the import path as nece
 import StoryPage from './pages/StoryPage'; // Import StoryPage
 import InquiryPage from './pages/InquiryPage';
 import AdminInquiriesPage from './pages/AdminInquiryPage';
+
 const App = () => {
-  
-  
   const user = JSON.parse(localStorage.getItem('user')); 
   console.log('User from localStorage:', user);
+  
   const NotFoundPage = () => {
     return <div>Page Not Found</div>;
   };
-  
+
   return (
     <Router>
       <Routes>
@@ -31,23 +34,20 @@ const App = () => {
           </>
         )}
         {user && user.role === "member" && (
-           <>
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/events" element={<EventPage />} />
-        <Route path="/donate" element={<DonationPage/>} />
-        <Route path="/membership" element={<MembershipPage/>} />
-        <Route path="/profile" element={<ProfilePage userId={user ? user.id : ''} />} /> 
-        <Route path="/stories" element={<StoryPage />} /> {/* Add route for StoryPage */}
-        <Route path="/ask" element={<InquiryPage />} /> 
-        </>
+          <>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/events" element={<EventPage />} />
+            <Route path="/donate" element={<DonationPage />} />
+            <Route path="/membership" element={<MembershipPage />} />
+            <Route path="/profile" element={<ProfilePage userId={user ? user.id : ''} />} /> 
+            <Route path="/stories" element={<StoryPage />} /> {/* Add route for StoryPage */}
+            <Route path="/ask" element={<InquiryPage />} /> 
+          </>
         )}
         {/* <Route path="*" element={<NotFoundPage />} /> */}
-        
-        </Routes>
+      </Routes>
     </Router>
   );
 };
 
 export default App;
-
-

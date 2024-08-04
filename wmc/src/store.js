@@ -1,6 +1,6 @@
 // store.js
 import { createStore, applyMiddleware, combineReducers } from 'redux';
-import {thunk} from 'redux-thunk'; // Correct import for thunk
+import thunk from 'redux-thunk'; // Correct import for thunk
 import adminReducer from '../src/reducers/AdminPageReducer'; // Import default export
 import { composeWithDevTools } from 'redux-devtools-extension';
 
