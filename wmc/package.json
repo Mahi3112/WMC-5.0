@@ -1,5 +1,5 @@
 {
-  "proxy": "https://wmc-5-0-1qty.onrender.com",
+  "proxy": "http://localhost:8000",
   "name": "wmc",
   "version": "0.1.0",
   "private": true,
